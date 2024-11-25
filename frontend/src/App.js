@@ -2,14 +2,34 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [habits, setHabits] = useState([]); // Almacenar hábitos
-  const [newHabit, setNewHabit] = useState(''); // Nuevo hábito
+  const [habits, setHabits] = useState([]);
+  const [newHabit, setNewHabit] = useState('');
+  const [editingIndex, setEditingIndex] = useState(null); // Estado para editar hábitos
+  const [editingText, setEditingText] = useState(''); // Texto del hábito en edición
 
   const addHabit = () => {
     if (newHabit.trim() !== '') {
-      setHabits([...habits, newHabit]); // Agrega el hábito al estado
-      setNewHabit(''); // Limpia el campo
+      setHabits([...habits, newHabit]);
+      setNewHabit('');
     }
+  };
+
+  const deleteHabit = (index) => {
+    setHabits(habits.filter((_, i) => i !== index)); // Elimina el hábito por índice
+  };
+
+  const editHabit = (index) => {
+    setEditingIndex(index);
+    setEditingText(habits[index]); // Coloca el texto del hábito actual en edición
+  };
+
+  const saveEdit = () => {
+    const updatedHabits = habits.map((habit, index) =>
+      index === editingIndex ? editingText : habit
+    );
+    setHabits(updatedHabits);
+    setEditingIndex(null);
+    setEditingText('');
   };
 
   return (
@@ -37,7 +57,24 @@ function App() {
             ) : (
               <ul>
                 {habits.map((habit, index) => (
-                  <li key={index}>{habit}</li>
+                  <li key={index}>
+                    {editingIndex === index ? (
+                      <div>
+                        <input
+                          type="text"
+                          value={editingText}
+                          onChange={(e) => setEditingText(e.target.value)}
+                        />
+                        <button onClick={saveEdit}>Guardar</button>
+                      </div>
+                    ) : (
+                      <span>{habit}</span>
+                    )}
+                    <button onClick={() => deleteHabit(index)}>Eliminar</button>
+                    {editingIndex !== index && (
+                      <button onClick={() => editHabit(index)}>Editar</button>
+                    )}
+                  </li>
                 ))}
               </ul>
             )}
