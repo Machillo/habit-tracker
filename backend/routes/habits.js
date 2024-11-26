@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const Habit = require('../models/Habit');
+const authenticate = require('../middleware/auth');
 
-// Obtener todos los hábitos
-router.get('/', async (req, res) => {
-  try {
-    const habits = await Habit.find();
-    res.json(habits);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener los hábitos' });
-  }
-});
+router.get('/', authenticate, async (req, res) => {
+    try {
+      const habits = await Habit.find();
+      res.json(habits);
+    } catch (err) {
+      res.status(500).json({ error: 'Error al obtener los hábitos' });
+    }
+  });
 
 // Crear un nuevo hábito
 router.post('/', async (req, res) => {
