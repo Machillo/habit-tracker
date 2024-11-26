@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import HabitList from './HabitList';
+import Login from './Login';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -20,11 +21,22 @@ function App() {
   const [newHabit, setNewHabit] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
+  // Función para manejar el cierre de sesión
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+  };
+
+  // Efecto para cargar los hábitos desde el backend
   useEffect(() => {
-    // Obtener hábitos del backend al cargar la app
+    if (!token) return; // No cargar si no hay token
+
     axios
-      .get('http://localhost:5000/api/habits')
+      .get('http://localhost:5000/api/habits', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         setHabits(response.data);
         setIsLoading(false);
@@ -34,8 +46,9 @@ function App() {
         setError('No se pudieron cargar los hábitos. Intenta de nuevo más tarde.');
         setIsLoading(false);
       });
-  }, []);
+  }, [token]);
 
+  // Función para agregar un nuevo hábito
   const addHabit = () => {
     if (newHabit.trim() === '') {
       alert('El hábito no puede estar vacío.');
@@ -48,7 +61,11 @@ function App() {
     }
 
     axios
-      .post('http://localhost:5000/api/habits', { name: newHabit })
+      .post(
+        'http://localhost:5000/api/habits',
+        { name: newHabit },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((response) => {
         setHabits([...habits, response.data]); // Agregar el nuevo hábito al estado
         setNewHabit('');
@@ -58,9 +75,12 @@ function App() {
       });
   };
 
+  // Función para eliminar un hábito
   const deleteHabit = (id) => {
     axios
-      .delete(`http://localhost:5000/api/habits/${id}`)
+      .delete(`http://localhost:5000/api/habits/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then(() => {
         setHabits(habits.filter((habit) => habit._id !== id)); // Eliminar el hábito del estado
       })
@@ -69,9 +89,14 @@ function App() {
       });
   };
 
+  // Función para actualizar el progreso de un hábito
   const updateProgress = (id, newProgress) => {
     axios
-      .put(`http://localhost:5000/api/habits/${id}`, { progress: newProgress })
+      .put(
+        `http://localhost:5000/api/habits/${id}`,
+        { progress: newProgress },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((response) => {
         const updatedHabits = habits.map((habit) =>
           habit._id === id ? response.data : habit
@@ -83,6 +108,7 @@ function App() {
       });
   };
 
+  // Datos para la gráfica
   const chartData = {
     labels: habits.map((habit) => habit.name),
     datasets: [
@@ -96,10 +122,19 @@ function App() {
     ],
   };
 
+  // Si no hay token, mostrar el formulario de inicio de sesión
+  if (!token) {
+    return <Login setToken={setToken} />;
+  }
+
+  // Renderización principal
   return (
     <div className="app">
       <header className="header">
         <h1>Gestión de Hábitos</h1>
+        <button onClick={handleLogout} className="logout-button">
+          Cerrar Sesión
+        </button>
       </header>
       <main className="main">
         <section className="habit-list">
