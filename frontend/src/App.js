@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import axios from 'axios';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,45 +11,76 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import HabitList from './HabitList';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function App() {
   const [habits, setHabits] = useState([]);
   const [newHabit, setNewHabit] = useState('');
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [editingText, setEditingText] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Obtener hábitos del backend al cargar la app
+    axios
+      .get('http://localhost:5000/api/habits')
+      .then((response) => {
+        setHabits(response.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error al obtener los hábitos:', error);
+        setError('No se pudieron cargar los hábitos. Intenta de nuevo más tarde.');
+        setIsLoading(false);
+      });
+  }, []);
 
   const addHabit = () => {
-    if (newHabit.trim() !== '') {
-      setHabits([...habits, { name: newHabit, progress: 0 }]);
-      setNewHabit('');
+    if (newHabit.trim() === '') {
+      alert('El hábito no puede estar vacío.');
+      return;
     }
+
+    if (habits.some((habit) => habit.name.toLowerCase() === newHabit.toLowerCase())) {
+      alert('Este hábito ya existe.');
+      return;
+    }
+
+    axios
+      .post('http://localhost:5000/api/habits', { name: newHabit })
+      .then((response) => {
+        setHabits([...habits, response.data]); // Agregar el nuevo hábito al estado
+        setNewHabit('');
+      })
+      .catch((error) => {
+        console.error('Error al agregar el hábito:', error);
+      });
   };
 
-  const deleteHabit = (index) => {
-    setHabits(habits.filter((_, i) => i !== index));
+  const deleteHabit = (id) => {
+    axios
+      .delete(`http://localhost:5000/api/habits/${id}`)
+      .then(() => {
+        setHabits(habits.filter((habit) => habit._id !== id)); // Eliminar el hábito del estado
+      })
+      .catch((error) => {
+        console.error('Error al eliminar el hábito:', error);
+      });
   };
 
-  const editHabit = (index) => {
-    setEditingIndex(index);
-    setEditingText(habits[index].name);
-  };
-
-  const saveEdit = () => {
-    const updatedHabits = habits.map((habit, index) =>
-      index === editingIndex ? { ...habit, name: editingText } : habit
-    );
-    setHabits(updatedHabits);
-    setEditingIndex(null);
-    setEditingText('');
-  };
-
-  const updateProgress = (index) => {
-    const updatedHabits = habits.map((habit, i) =>
-      i === index ? { ...habit, progress: habit.progress + 1 } : habit
-    );
-    setHabits(updatedHabits);
+  const updateProgress = (id, newProgress) => {
+    axios
+      .put(`http://localhost:5000/api/habits/${id}`, { progress: newProgress })
+      .then((response) => {
+        const updatedHabits = habits.map((habit) =>
+          habit._id === id ? response.data : habit
+        );
+        setHabits(updatedHabits);
+      })
+      .catch((error) => {
+        console.error('Error al actualizar el progreso:', error);
+      });
   };
 
   const chartData = {
@@ -83,33 +115,18 @@ function App() {
               + Agregar Hábito
             </button>
           </div>
+          {error && <p className="error-message">{error}</p>}
           <div className="habits">
-            {habits.length === 0 ? (
+            {isLoading ? (
+              <p>Cargando hábitos...</p>
+            ) : habits.length === 0 ? (
               <p>No tienes hábitos aún. ¡Comienza creando uno!</p>
             ) : (
-              <ul>
-                {habits.map((habit, index) => (
-                  <li key={index}>
-                    {editingIndex === index ? (
-                      <div>
-                        <input
-                          type="text"
-                          value={editingText}
-                          onChange={(e) => setEditingText(e.target.value)}
-                        />
-                        <button onClick={saveEdit}>Guardar</button>
-                      </div>
-                    ) : (
-                      <span>{habit.name}</span>
-                    )}
-                    <button onClick={() => deleteHabit(index)}>Eliminar</button>
-                    {editingIndex !== index && (
-                      <button onClick={() => editHabit(index)}>Editar</button>
-                    )}
-                    <button onClick={() => updateProgress(index)}>+1 Progreso</button>
-                  </li>
-                ))}
-              </ul>
+              <HabitList
+                habits={habits}
+                deleteHabit={deleteHabit}
+                updateProgress={updateProgress}
+              />
             )}
           </div>
         </section>
