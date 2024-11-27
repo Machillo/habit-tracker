@@ -5,7 +5,14 @@ const User = require('../models/User');
 const router = express.Router();
 const SECRET_KEY = 'TlpeCqmFgD.303412';
 
-//Registro
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 router.post('/register', async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -21,7 +28,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Inicio de sesión
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {

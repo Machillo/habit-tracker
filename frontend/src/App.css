@@ -1,3 +1,4 @@
+/* Estilos generales */
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
@@ -10,6 +11,7 @@ body {
   padding: 20px;
 }
 
+/* Estilos del encabezado */
 .header {
   background-color: rgba(0, 0, 0, 0.2);
   padding: 20px;
@@ -22,6 +24,7 @@ body {
   margin: 0;
 }
 
+/* Estilos principales */
 .main {
   margin-top: 20px;
 }
@@ -38,6 +41,19 @@ body {
   font-size: 2rem;
 }
 
+.add-habit {
+  margin: 10px 0;
+}
+
+.add-habit input {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin-right: 10px;
+}
+
+/* Botón de agregar hábito */
 .add-habit-button {
   background: #00d2ff;
   color: #fff;
@@ -55,43 +71,7 @@ body {
   transform: scale(1.1);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.habits p {
-  font-style: italic;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.add-habit {
-  margin: 10px 0;
-}
-
-.add-habit input {
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  margin-right: 10px;
-}
-
+/* Lista de hábitos */
 .habits ul {
   list-style: none;
   padding: 0;
@@ -121,13 +101,7 @@ body {
   background: rgba(255, 255, 255, 0.4);
 }
 
-.habits input {
-  padding: 5px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
+/* Gráfica */
 .chart-section {
   margin-top: 20px;
   padding: 20px;
@@ -141,8 +115,138 @@ body {
   margin-bottom: 20px;
 }
 
+/* Mensajes de error */
 .error-message {
   color: red;
   font-weight: bold;
   margin: 10px 0;
+}
+
+.auth-container {
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  animation: fadeInScale 0.5s ease;
+}
+
+.auth-container input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.auth-container input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.auth-container button {
+  padding: 10px 20px;
+  background-color: #00d2ff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.auth-container button:hover {
+  background-color: #007bb5;
+}
+
+.google-login {
+  background: #db4437;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.google-login:hover {
+  background: #a33324;
+}
+
+.toggle-link {
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+.link-text {
+  color: #00d2ff;
+  cursor: pointer;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}
+
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .app {
+    padding: 10px;
+  }
+
+  .auth-container {
+    padding: 15px;
+    width: 90%;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .habit-list h2,
+  .chart-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .add-habit-button {
+    font-size: 1rem;
+    padding: 8px 15px;
+  }
 }

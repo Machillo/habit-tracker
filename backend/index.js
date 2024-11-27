@@ -4,6 +4,8 @@ const cors = require('cors');
 const habitRoutes = require('./routes/habits');
 const app = express();
 const authRoutes = require('./routes/auth');
+require('dotenv').config();
+
 
 
 app.use(cors());
